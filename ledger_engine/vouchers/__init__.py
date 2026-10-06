@@ -10,6 +10,7 @@ rule stages the pipeline composes:
 * :mod:`ledger_engine.vouchers.entries`   -- entry business rules;
 * :mod:`ledger_engine.vouchers.assemble`  -- result construction;
 * :mod:`ledger_engine.vouchers.pipeline`  -- phase orchestration;
+* :mod:`ledger_engine.vouchers.ledger`    -- shared turnover aggregation;
 * :mod:`ledger_engine.vouchers.posting`   -- journal/balance assembly;
 * :mod:`ledger_engine.vouchers.trial_balance` -- trial balance assembly.
 

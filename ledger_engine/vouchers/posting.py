@@ -3,16 +3,20 @@
 The public :func:`post_vouchers` consumes the same validated batch as
 :func:`ledger_engine.vouchers.pipeline.normalize_vouchers`, so the
 validation order, exception categories, exact-match account resolution
-and integer-cents arithmetic are shared, not copied.  Only shape
-assembly lives here: journal rows in voucher-then-line order, and one
-summary row per chart account in original chart order.  Every amount
-is rendered with exactly two decimal places via the shared fixed-point
-primitives; inputs are never mutated and repeated calls return equal,
-brand-new containers.
+and integer-cents arithmetic are shared, not copied.  Per-account
+debit/credit turnovers come from the single internal aggregation
+:func:`ledger_engine.vouchers.ledger.accumulate_turnovers`, shared with
+the trial balance; only posting-specific shape assembly lives here:
+journal rows in voucher-then-line order, and one summary row per chart
+account in original chart order with the ``normal_side`` ending rule.
+Every amount is rendered with exactly two decimal places via the shared
+fixed-point primitives; inputs are never mutated and repeated calls
+return equal, brand-new containers.
 """
 from __future__ import annotations
 
 from .amounts import format_cents
+from .ledger import accumulate_turnovers
 from .pipeline import _validate_batch
 
 __all__ = ["post_vouchers"]
@@ -55,13 +59,16 @@ def _build_journal_row(structured, entry) -> dict:
     return {field: values[field] for field in _JOURNAL_FIELD_ORDER}
 
 
-def _build_account_row(account, debit_cents: int, credit_cents: int) -> dict:
-    """Assemble one account summary row from integer-cents turnovers.
+def _build_account_row(turnover) -> dict:
+    """Assemble one account summary row from a shared turnover fact.
 
     The net is taken in the account's normal direction; a negative net
     flips ``ending_side`` to the opposite side with the absolute value,
     and a zero net keeps ``normal_side``.
     """
+    account = turnover.account
+    debit_cents = turnover.debit_cents
+    credit_cents = turnover.credit_cents
     if account.normal_side == "debit":
         net = debit_cents - credit_cents
     else:
@@ -104,21 +111,15 @@ def post_vouchers(
     )
 
     journal: list[dict] = []
-    # Integer-cents [debit, credit] turnovers keyed by exact code; every
-    # chart account starts at zero so unused accounts still report 0.00.
-    turnovers: dict[str, list[int]] = {
-        code: [0, 0] for code in chart.accounts
-    }
     for structured, body in validated:
         for entry in body.entries:
             journal.append(_build_journal_row(structured, entry))
-            totals = turnovers[entry.account_code]
-            totals[0] += entry.debit_cents
-            totals[1] += entry.credit_cents
 
+    # Turnovers are the single shared accumulation fact; posting only
+    # layers its normal_side ending presentation on top.
     accounts = [
-        _build_account_row(account, *turnovers[account.code])
-        for account in chart.accounts.values()
+        _build_account_row(turnover)
+        for turnover in accumulate_turnovers(chart, validated)
     ]
 
     return {
