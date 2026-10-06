@@ -4,17 +4,20 @@ The public :func:`build_trial_balance` consumes the same validated batch
 as :func:`ledger_engine.vouchers.pipeline.normalize_vouchers` and
 :func:`ledger_engine.vouchers.posting.post_vouchers`, so the validation
 order, exception categories, exact-match account resolution and
-integer-cents arithmetic are shared, not copied.  Only shape assembly
-lives here: one row per chart account in original chart order, and a
-single totals summary.  The ending net always takes the debit-minus-
-credit direction, independent of an account's ``normal_side``; a zero
-net reports ``0.00`` on both sides.  Every amount is rendered with
-exactly two decimal places via the shared fixed-point primitives;
-inputs are never mutated and repeated calls return equal, brand-new
-containers.
+integer-cents arithmetic are shared, not copied.  Per-account
+debit/credit accumulation comes from
+:mod:`ledger_engine.vouchers.aggregation`, the single internal source
+also used by posting.  Only shape assembly lives here: one row per
+chart account in original chart order, and a single totals summary.
+The ending net always takes the debit-minus-credit direction,
+independent of an account's ``normal_side``; a zero net reports
+``0.00`` on both sides.  Every amount is rendered with exactly two
+decimal places via the shared fixed-point primitives; inputs are never
+mutated and repeated calls return equal, brand-new containers.
 """
 from __future__ import annotations
 
+from .aggregation import accumulate_turnovers
 from .amounts import format_cents
 from .pipeline import _validate_batch
 
@@ -87,16 +90,9 @@ def build_trial_balance(
         base_currency, chart_of_accounts, vouchers
     )
 
-    # Integer-cents [debit, credit] turnovers keyed by exact code; every
-    # chart account starts at zero so unused accounts still report 0.00.
-    turnovers: dict[str, list[int]] = {
-        code: [0, 0] for code in chart.accounts
-    }
-    for _structured, body in validated:
-        for entry in body.entries:
-            totals = turnovers[entry.account_code]
-            totals[0] += entry.debit_cents
-            totals[1] += entry.credit_cents
+    # Shared accumulation: every chart account starts at (0, 0), so
+    # unused accounts still report 0.00 without a local zero-init here.
+    turnovers = accumulate_turnovers(chart, validated)
 
     accounts: list[dict] = []
     total_debit = total_credit = 0
