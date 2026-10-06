@@ -9,11 +9,12 @@ rule stages the pipeline composes:
 * :mod:`ledger_engine.vouchers.structure` -- voucher shape checks;
 * :mod:`ledger_engine.vouchers.entries`   -- entry business rules;
 * :mod:`ledger_engine.vouchers.assemble`  -- result construction;
-* :mod:`ledger_engine.vouchers.pipeline`  -- phase orchestration.
+* :mod:`ledger_engine.vouchers.pipeline`  -- phase orchestration;
+* :mod:`ledger_engine.vouchers.posting`   -- journal/balance assembly.
 
 Pure-Python, no runtime dependencies, no global state.  Inputs are never
-mutated; on success a new list of JSON-serializable dicts is returned in
-the same order.  Validation stops at the first problem encountered.
+mutated; on success new JSON-serializable containers are returned in the
+same order.  Validation stops at the first problem encountered.
 """
 from __future__ import annotations
 
@@ -29,9 +30,11 @@ from .errors import (
     VoucherFormatError,
 )
 from .pipeline import normalize_vouchers
+from .posting import post_vouchers
 
 __all__ = [
     "normalize_vouchers",
+    "post_vouchers",
     "LedgerEngineError",
     "ChartOfAccountsError",
     "VoucherFormatError",

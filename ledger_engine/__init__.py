@@ -10,12 +10,14 @@ from .vouchers import (
     UnknownAccountError,
     VoucherFormatError,
     normalize_vouchers,
+    post_vouchers,
 )
 
 __version__ = "0.1.0"
 
 __all__ = [
     "normalize_vouchers",
+    "post_vouchers",
     "LedgerEngineError",
     "ChartOfAccountsError",
     "VoucherFormatError",
