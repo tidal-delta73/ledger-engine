@@ -14,6 +14,23 @@ from .vouchers import (
     post_vouchers,
     reverse_vouchers,
 )
+from .reconciliation import (
+    DIFF_AMBIGUOUS,
+    DIFF_AMOUNT_MISMATCH,
+    DIFF_BASE_AMOUNT_MISMATCH,
+    DIFF_CURRENCY_MISMATCH,
+    DIFF_EXTERNAL_MISSING,
+    DIFF_LEDGER_MISSING,
+    DIFF_MATCHED,
+    MATCH_ATTRIBUTES,
+    MATCH_SOURCE_ID,
+    MATCH_VOUCHER_REF,
+    OUTCOME_INVALID_INPUT,
+    OUTCOME_PERIOD_STATUS_CONFLICT,
+    OUTCOME_RECONCILED,
+    OUTCOME_TARGET_NOT_FOUND,
+    build_reconciliation_report,
+)
 
 __version__ = "0.1.0"
 
@@ -22,6 +39,7 @@ __all__ = [
     "post_vouchers",
     "reverse_vouchers",
     "build_trial_balance",
+    "build_reconciliation_report",
     "LedgerEngineError",
     "ChartOfAccountsError",
     "VoucherFormatError",
@@ -31,5 +49,19 @@ __all__ = [
     "InactiveAccountError",
     "InvalidEntryAmountError",
     "UnbalancedVoucherError",
+    "OUTCOME_RECONCILED",
+    "OUTCOME_TARGET_NOT_FOUND",
+    "OUTCOME_PERIOD_STATUS_CONFLICT",
+    "OUTCOME_INVALID_INPUT",
+    "DIFF_MATCHED",
+    "DIFF_LEDGER_MISSING",
+    "DIFF_EXTERNAL_MISSING",
+    "DIFF_AMOUNT_MISMATCH",
+    "DIFF_CURRENCY_MISMATCH",
+    "DIFF_BASE_AMOUNT_MISMATCH",
+    "DIFF_AMBIGUOUS",
+    "MATCH_SOURCE_ID",
+    "MATCH_VOUCHER_REF",
+    "MATCH_ATTRIBUTES",
     "__version__",
 ]
