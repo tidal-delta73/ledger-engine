@@ -12,7 +12,8 @@ rule stages the pipeline composes:
 * :mod:`ledger_engine.vouchers.pipeline`  -- phase orchestration;
 * :mod:`ledger_engine.vouchers.aggregation` -- per-account accumulation;
 * :mod:`ledger_engine.vouchers.posting`   -- journal/balance assembly;
-* :mod:`ledger_engine.vouchers.trial_balance` -- trial balance assembly.
+* :mod:`ledger_engine.vouchers.trial_balance` -- trial balance assembly;
+* :mod:`ledger_engine.vouchers.reversal`  -- batch reversal assembly.
 
 Pure-Python, no runtime dependencies, no global state.  Inputs are never
 mutated; on success new JSON-serializable containers are returned in the
@@ -33,12 +34,14 @@ from .errors import (
 )
 from .pipeline import normalize_vouchers
 from .posting import post_vouchers
+from .reversal import reverse_vouchers
 from .trial_balance import build_trial_balance
 
 __all__ = [
     "normalize_vouchers",
     "post_vouchers",
     "build_trial_balance",
+    "reverse_vouchers",
     "LedgerEngineError",
     "ChartOfAccountsError",
     "VoucherFormatError",
