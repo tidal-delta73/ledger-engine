@@ -14,6 +14,12 @@ from .vouchers import (
     post_vouchers,
     reverse_vouchers,
 )
+from .reconciliation import (
+    InvalidReconciliationInputError,
+    PeriodStatusConflictError,
+    TargetNotFoundError,
+    build_reconciliation_report,
+)
 
 __version__ = "0.1.0"
 
@@ -22,6 +28,7 @@ __all__ = [
     "post_vouchers",
     "reverse_vouchers",
     "build_trial_balance",
+    "build_reconciliation_report",
     "LedgerEngineError",
     "ChartOfAccountsError",
     "VoucherFormatError",
@@ -31,5 +38,8 @@ __all__ = [
     "InactiveAccountError",
     "InvalidEntryAmountError",
     "UnbalancedVoucherError",
+    "InvalidReconciliationInputError",
+    "TargetNotFoundError",
+    "PeriodStatusConflictError",
     "__version__",
 ]
