@@ -12,6 +12,7 @@ from .vouchers import (
     build_trial_balance,
     normalize_vouchers,
     post_vouchers,
+    reverse_vouchers,
 )
 
 __version__ = "0.1.0"
@@ -19,6 +20,7 @@ __version__ = "0.1.0"
 __all__ = [
     "normalize_vouchers",
     "post_vouchers",
+    "reverse_vouchers",
     "build_trial_balance",
     "LedgerEngineError",
     "ChartOfAccountsError",
